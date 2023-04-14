@@ -1,6 +1,6 @@
-import { schemeAccent } from 'd3';
-import React from 'react';
-import { SimpleRectangleProps } from '../../chart-items/rectangular/SimpleRectangle';
+import { color as d3Color, HierarchyRectangularNode, schemeAccent } from 'd3';
+import React, { useState } from 'react';
+import { SimpleRectangle, SimpleRectangleProps } from '../../chart-items/rectangular/SimpleRectangle';
 import { SequencesIcicle } from './SequencesIcicle';
 
 export default {
@@ -44,27 +44,56 @@ const sampleData = (function () {
 
 const value = (d: SampleDataNode) => d.value || 0;
 
-export const WithDefaultItem = () => (
-  <SequencesIcicle<SampleDataNode, SimpleRectangleProps>
-    data={sampleData}
-    valueAccessor={value}
-    style={{ height: 400, width: '100%' }}
-    extraItemProps={(d) => ({ fill: colors[d.data.page] })}
-  />
-);
+function getDarkerColor(c: string) {
+  return d3Color(c)?.darker().toString();
+}
 
-type CustomRectProps = SimpleRectangleProps & { rx: number };
-const CustomRect = ({ x, y, w, h, fill, stroke, rx }: CustomRectProps) => {
-  return <rect x={x} y={y} height={h} width={w} fill={fill} stroke={stroke} rx={rx} />;
+export const WithDefaultChildren = () => <SequencesIcicle data={sampleData} valueAccessor={value} style={{ height: 400, width: '100%' }} />;
+
+export const WithDefaultCustomizedChildren = () => {
+  const [hoveredItem, setHoveredItem] = useState<HierarchyRectangularNode<SampleDataNode> | null>(null);
+  return (
+    <SequencesIcicle
+      data={sampleData}
+      valueAccessor={value}
+      style={{ height: 400, width: '100%' }}
+      hoveredItem={hoveredItem}
+      onHover={setHoveredItem}
+    >
+      {({ rect, item }) => (
+        <SimpleRectangle
+          {...rect}
+          fill={item.data === hoveredItem?.data ? getDarkerColor(colors[item.data.page]) : colors[item.data.page]}
+        />
+      )}
+    </SequencesIcicle>
+  );
 };
 
-export const WithCustomItem = () => (
-  <SequencesIcicle<SampleDataNode, CustomRectProps>
-    data={sampleData}
-    valueAccessor={value}
-    style={{ height: 400, width: '100%' }}
-    padding={5}
-    itemComponent={CustomRect}
-    extraItemProps={(d) => ({ fill: colors[d.data.page], stroke: 'grey', rx: (d.depth + 1) * 4 })}
-  />
-);
+type CustomRectProps = SimpleRectangleProps & { rx: number };
+const CustomRect = (props: CustomRectProps) => {
+  return <rect {...props} />;
+};
+
+export const WithCustomItem = () => {
+  const [selected, setSelected] = useState<HierarchyRectangularNode<SampleDataNode> | null>(null);
+  return (
+    <SequencesIcicle
+      data={sampleData}
+      valueAccessor={value}
+      style={{ height: 400, width: '100%' }}
+      padding={5}
+      onSelect={setSelected}
+      selectedItem={selected}
+    >
+      {({ rect, item }) => (
+        <CustomRect
+          {...rect}
+          fill={item.data === selected?.data ? getDarkerColor(colors[item.data.page]) : colors[item.data.page]}
+          stroke="grey"
+          rx={(item.depth + 1) * 4}
+        />
+      )}
+    </SequencesIcicle>
+  );
+};

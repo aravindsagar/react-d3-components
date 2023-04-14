@@ -6,6 +6,8 @@ export interface SimpleRectangleProps extends RectangularProps {
   stroke?: string;
 }
 
-export function SimpleRectangle({ x, y, w, h, fill, stroke }: SimpleRectangleProps): JSX.Element {
-  return <rect x={x} y={y} height={h} width={w} fill={fill} stroke={stroke} />;
+function _SimpleRectangle(props: SimpleRectangleProps): JSX.Element {
+  return <rect {...props} />;
 }
+
+export const SimpleRectangle = React.memo(_SimpleRectangle);

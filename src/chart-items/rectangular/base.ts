@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface RectangularProps {
   // x position
   x: number;
@@ -6,8 +8,17 @@ export interface RectangularProps {
   y: number;
 
   // width
-  w: number;
+  width: number;
 
   // height
-  h: number;
+  height: number;
+
+  // Interactions
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onClick?: () => void;
+
+  // Styling
+  className?: string;
+  style?: React.CSSProperties;
 }

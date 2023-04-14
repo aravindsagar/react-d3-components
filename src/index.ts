@@ -1,3 +1,4 @@
-import TestComponent from './TestComponent';
+import './index.css';
 
-export { TestComponent };
+export * from './chart-items';
+export * from './chart-layouts';
