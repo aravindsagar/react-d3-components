@@ -1,3 +1,4 @@
+import { useSpring } from '@react-spring/web';
 import { hierarchy, HierarchyRectangularNode, partition } from 'd3-hierarchy';
 import React, { useCallback, useMemo } from 'react';
 import { RectangularProps } from '../../chart-items/rectangular/base';
@@ -12,7 +13,7 @@ export interface SequencesIcicleProps<Datum> {
   data: Datum;
   childrenAccessor?: (d: Datum) => Iterable<Datum>;
   valueAccessor: (d: Datum) => number;
-  idAccessor?: (d: Datum) => unknown;
+  idAccessor?: (d: Datum) => string | number;
 
   // Built in styling options
   padding?: number;
@@ -33,6 +34,7 @@ export function SequencesIcicle<Datum>({
   data,
   childrenAccessor,
   valueAccessor,
+  idAccessor,
   padding = 2,
   style,
   className,
@@ -40,7 +42,6 @@ export function SequencesIcicle<Datum>({
   ...rest
 }: SequencesIcicleProps<Datum>): JSX.Element {
   const { width, height, ref } = useElementSize();
-
   const partitioned = useMemo<HierarchyRectangularNode<Datum>[]>(() => {
     const hierarchialData = hierarchy(data, childrenAccessor)
       .sum(valueAccessor)
@@ -56,7 +57,7 @@ export function SequencesIcicle<Datum>({
     <div ref={ref} style={style} className={className}>
       <svg height={height} width={width} viewBox={`0 0 ${width} ${height}`}>
         {partitioned.map((d, idx) => (
-          <ChildRenderer key={idx} item={d} {...rest}>
+          <ChildRenderer key={idAccessor ? idAccessor(d.data) : idx} item={d} idAccessor={idAccessor} {...rest}>
             {children}
           </ChildRenderer>
         ))}
@@ -74,7 +75,7 @@ function ChildRenderer<Datum>(
   const { children, item, onHover, selectedItem, onSelect, idAccessor } = props;
   const isEqual = useCallback(
     (a?: HierarchyRectangularNode<Datum>, b?: HierarchyRectangularNode<Datum>) =>
-      idAccessor ? idAccessor(a?.data) === idAccessor(b?.data) : a?.data === b?.data,
+      idAccessor && a && b ? idAccessor(a.data) === idAccessor(b.data) : a?.data === b?.data,
     [idAccessor]
   );
 
@@ -87,11 +88,15 @@ function ChildRenderer<Datum>(
     else onSelect(item);
   }, [isEqual, item, onSelect, selectedItem]);
 
+  const spring = useSpring({
+    to: { x: item.x0, y: item.y0, height: item.y1 - item.y0, width: item.x1 - item.x0 },
+    // config: { duration: 1000 },
+  });
   const rect: RectangularProps = {
-    x: item.x0,
-    y: item.y0,
-    height: item.y1 - item.y0,
-    width: item.x1 - item.x0,
+    x: spring.x,
+    y: spring.y,
+    height: spring.height,
+    width: spring.width,
     onMouseEnter,
     onMouseLeave,
     onClick,

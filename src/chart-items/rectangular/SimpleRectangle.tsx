@@ -1,3 +1,4 @@
+import { animated } from '@react-spring/web';
 import React from 'react';
 import { RectangularProps } from './base';
 
@@ -7,7 +8,7 @@ export interface SimpleRectangleProps extends RectangularProps {
 }
 
 function _SimpleRectangle(props: SimpleRectangleProps): JSX.Element {
-  return <rect {...props} />;
+  return <animated.rect {...props} />;
 }
 
 export const SimpleRectangle = React.memo(_SimpleRectangle);

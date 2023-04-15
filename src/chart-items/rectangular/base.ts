@@ -1,17 +1,18 @@
+import { SpringValue } from '@react-spring/web';
 import React from 'react';
 
 export interface RectangularProps {
   // x position
-  x: number;
+  x: SpringValue<number>;
 
   // y position
-  y: number;
+  y: SpringValue<number>;
 
   // width
-  width: number;
+  width: SpringValue<number>;
 
   // height
-  height: number;
+  height: SpringValue<number>;
 
   // Interactions
   onMouseEnter?: () => void;
