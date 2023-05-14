@@ -82,7 +82,7 @@ export const Default: Story = {
 export const ControlChildRender: Story = {
   args: { data: sampleData },
   render: (props) => {
-    const [args, updateArgs, resetArgs] = useArgs();
+    const [args, updateArgs] = useArgs();
     return (
       <SequencesIcicle {...props} onHover={(item) => updateArgs({ hoveredItem: item ? { data: item.data } : null })}>
         {({ rect, item }) => (
@@ -105,7 +105,7 @@ const CustomRect = (props: CustomRectProps) => {
 export const WithCustomChild: Story = {
   args: { data: sampleData },
   render: (props) => {
-    const [args, updateArgs, resetArgs] = useArgs();
+    const [args, updateArgs] = useArgs();
     const changeData = () => updateArgs({ data: args.data === sampleData ? updatedData : sampleData });
     props.onHover = (item) => updateArgs({ hoveredItem: item ? { data: item.data } : null });
     props.onSelect = (item) => updateArgs({ hoveredItem: null, selectedItem: item ? { data: item.data } : null });
